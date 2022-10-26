@@ -24,7 +24,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../apache-tomcat-9.0.68/lib/jsp-api.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../../kdt3/apache-tomcat-9.0.68/lib/jasper.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -33,7 +33,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../apache-tomcat-9.0.68/lib/servlet-api.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../../kdt3/apache-tomcat-9.0.68/lib/jsp-api.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -42,7 +42,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../apache-tomcat-9.0.68/lib/jasper.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../../kdt3/apache-tomcat-9.0.68/lib/servlet-api.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

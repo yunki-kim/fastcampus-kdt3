@@ -7,10 +7,10 @@
           <element id="module-output" name="JDBC" />
         </element>
         <element id="directory" name="lib">
-          <element id="file-copy" path="$PROJECT_DIR$/../apache-tomcat-9.0.68/lib/jasper.jar" />
-          <element id="file-copy" path="$PROJECT_DIR$/../h2/bin/h2-2.1.214.jar" />
-          <element id="file-copy" path="$PROJECT_DIR$/../apache-tomcat-9.0.68/lib/tomcat-dbcp.jar" />
-          <element id="file-copy" path="$PROJECT_DIR$/../apache-tomcat-9.0.68/lib/tomcat-jdbc.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/../../kdt3/apache-tomcat-9.0.68/lib/jasper.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/../../kdt3/apache-tomcat-9.0.68/lib/tomcat-dbcp.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/../../kdt3/apache-tomcat-9.0.68/lib/tomcat-jdbc.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/../../kdt3/h2/bin/h2-2.1.214.jar" />
         </element>
       </element>
       <element id="javaee-facet-resources" facet="JDBC/web/Web" />

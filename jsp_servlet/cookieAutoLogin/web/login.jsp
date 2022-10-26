@@ -1,7 +1,5 @@
 <%@ page import="util.Status" %>
 <%@ page import="java.util.Arrays" %>
-<%@ page import="java.util.stream.Collectors" %>
-<%@ page import="java.util.List" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
@@ -20,47 +18,7 @@
         response.sendRedirect("./index.jsp");
     }
 
-%>
-
-<%
-
-    ///////////////// 쿠키 값 중 로그인하기 위해서 무조건 있어야하는 값이 없는지 확인 //////////////////
-    String[] mustCookies = {"COOKIE_ID", "COOKIE_PW", "COOKIE_HASH_PW", "AUTO_LOGIN"};
     Cookie[] cookies = request.getCookies();
-    String[] cookiesName = Arrays.stream(request.getCookies()).map(c -> c.getName()).toArray(String[]::new);
-    boolean isMustCookies = false;
-    for (int i = 0; i < mustCookies.length; i++) {
-        if (cookiesName != null) {
-            for (int j = 0; j < cookiesName.length; j++) {
-                if (mustCookies[i].equals(cookiesName[j])) {
-                    isMustCookies = true;
-                    break;
-                }
-            }
-            if (!isMustCookies) {
-                break;
-            }
-        }
-    }
-
-    // 하나라도 없으면 쿠키에 저장된 모든 요소 다 삭제
-    if (!isMustCookies) {
-        for (int i = 0; i < mustCookies.length; i++) {
-            if (cookies != null) {
-                for (int j = 0; j < cookies.length; j++) {
-                    if (mustCookies[i].equals(cookies[j].getName())) {
-                        cookies[j].setMaxAge(0);
-                        cookies[j].setPath("/");
-                        response.addCookie(cookies[j]);
-                    }
-                }
-            }
-        }
-    }
-%>
-
-<%
-    //////////////////////////// 자동 로그인 시도 ///////////////////////////
     if (cookies != null) {
         for (Cookie cookie : cookies) {
             if (cookie.getName() != null) {
