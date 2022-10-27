@@ -1,7 +1,9 @@
 package me.java.file;
 
 import me.java.database.JDBCMgr;
+import me.java.member.Member;
 
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -9,8 +11,6 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class FilePostDAO {
 
@@ -20,10 +20,10 @@ public class FilePostDAO {
     private PreparedStatement stmt = null;
     private ResultSet rs = null;
 
-    private static final String FILEPOST_SELECT_ALL = "select * from filepost";
-    private static final String FILEPOST_SELECT = "select * from filepost where uId = ?";
-    private static final String FILEPOST_INSERT = "insert into filepost(uId, title, fileInfo) values(?, ?, ?)";
-    private static final String FILEPOST_DELETE = "delete filepost where uId = ?";
+    private static final String FILEPOST_SELECT_ALL = "select * from filePost";
+    private static final String FILEPOST_SELECT = "select * from filePost where uId = ?";
+    private static final String FILEPOST_INSERT = "insert into filePost(uId, title, fileInfo) values(?, ?, ?)";
+    private static final String FILEPOST_DELETE = "delete filePost where uId = ?";
 
     private FilePostDAO() {}
 
@@ -34,8 +34,10 @@ public class FilePostDAO {
         return filePostDAO;
     }
 
+
     public FilePost select(String uId) {
         FilePost filePost = null;
+
         try {
             conn = JDBCMgr.getConnection();
             stmt = conn.prepareStatement(FILEPOST_SELECT);
@@ -54,6 +56,12 @@ public class FilePostDAO {
 
         } catch (SQLException e) {
             e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(e);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
         } finally {
             JDBCMgr.close(rs, stmt, conn);
         }
@@ -80,6 +88,12 @@ public class FilePostDAO {
 
         } catch (SQLException e) {
             e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(e);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
         } finally {
             JDBCMgr.close(rs, stmt, conn);
         }
@@ -118,48 +132,50 @@ public class FilePostDAO {
         return res;
     }
 
-
-    public List<FileInfo> parseStringToFileInfoList(String string) {
+    public List<FileInfo> parseStringToFileInfoList(String string) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         List<FileInfo> fileInfoLinkedList = new LinkedList<>();
-        List<String> tokens = new LinkedList<>();
+        List<String> tokens = new LinkedList<>(); // 4개가 찼다!
+        String[] methods = {"setFileName", "setChangedFileName", "setFileType", "setFileLocation"};
 
         StringTokenizer stringTokenizer = new StringTokenizer(string, "\'");
         int count = 0;
         while (stringTokenizer.hasMoreTokens()) {
             count++;
             String str = stringTokenizer.nextToken();
-            if (count % 2 == 1)continue;
-            tokens.add(str);
+            if (count % 2 == 1) continue;
 
+            tokens.add(str);
             FileInfo fileInfo = null;
-            if (tokens.size() == 4 ) {
+            if (tokens.size() == FileInfo.class.getDeclaredFields().length) {
                 fileInfo = new FileInfo();
-                fileInfo.setFileName(tokens.get(0));
-                fileInfo.setChangedFileName(tokens.get(1));
-                fileInfo.setFileType(tokens.get(2));
-                fileInfo.setFileLocation(tokens.get(3));
+                for (int i = 0; i < fileInfo.getClass().getDeclaredFields().length; i++) {
+                    fileInfo.getClass().getMethod(methods[i]).invoke(tokens.get(i));
+                }
+//                fileInfo.setFileName(tokens.get(0));
+//                fileInfo.setChangedFileName(tokens.get(1));
+//                fileInfo.setFileType(tokens.get(2));
+//                fileInfo.setFileLocation(tokens.get(3));
 
                 tokens.clear();
                 fileInfoLinkedList.add(fileInfo);
             }
         }
         return fileInfoLinkedList;
-
-        // Pattern pattern = Pattern.compile("['](.*?)[']");
-        // Matcher matcher = pattern.matcher(string);
-        //
-        // // FileInfo fileInfo = null;
-        // while (matcher.find()) {
-        //     System.out.println(matcher.group(1));
-        //
-        //     if (matcher.group(1) == null) {
-        //         break;
-        //     }
-        // }
     }
 
-    // public static void main(String[] args) {
-    //     String str = "[FileInfo{fileName='Hello.java', changedFileName='352869937402583', fileType='application/octet-stream', fileLocation='../upload/352869937402583'}, FileInfo{fileName='Hello.java', changedFileName='352869937402583', fileType='application/octet-stream', fileLocation='../upload/352869937402583'}]";
-    //     parseStringToFileInfoList(str);
-    // }
+//    public static void main(String[] args) {
+//        String str = "[FileInfo{fileName='Hello.java', changedFileName='352869937402583', " +
+//                "fileType='application/octet-stream', " +
+//                "fileLocation='../upload/352869937402583'}, " +
+//                "FileInfo{fileName='Hello.java', changedFileName='352869937402583', fileType='application/octet-stream', " +
+//                "fileLocation='../upload/352869937402583'}]";
+//        List<FileInfo> fileInfoList = parseStringToFileInfoList(str);
+//        for (int i = 0; i < fileInfoList.size(); i++) {
+//            FileInfo fileInfo = fileInfoList.get(i);
+//            System.out.println(fileInfo.getFileName());
+//            System.out.println(fileInfo.getChangedFileName());
+//            System.out.println(fileInfo.getFileType());
+//            System.out.println(fileInfo.getFileLocation());
+//        }
+//    }
 }
