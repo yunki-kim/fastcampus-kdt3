@@ -1,10 +1,9 @@
 package me.servlet.file;
 
 import com.oreilly.servlet.MultipartRequest;
-import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
+import me.java.file.CustomRenamePolicy;
 import me.java.file.FileInfo;
 import me.java.file.FilePost;
-import me.java.file.CustomRenamePolicy;
 import me.java.file.FilePostDAO;
 
 import javax.servlet.ServletContext;
@@ -17,8 +16,9 @@ import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Enumeration;
+import java.util.LinkedList;
+import java.util.List;
 
 @WebServlet(name = "DoFileUploadServlet", value = "/DoFileUploadServlet")
 public class DoFileUploadServlet extends HttpServlet {
@@ -98,9 +98,9 @@ public class DoFileUploadServlet extends HttpServlet {
             int res = filePostDAO.insert(filePost);
             if (res > 0) {
                 session.setAttribute("filePost", filePost);
-                //response.sendRedirect("./file/fileView.jsp");
+                response.sendRedirect("./file/fileView.jsp");
             } else {
-                //response.sendRedirect("./file/fileSelect.jsp");
+                response.sendRedirect("./file/fileSelect.jsp");
             }
         } catch (FileNotFoundException e) {
             new RuntimeException();

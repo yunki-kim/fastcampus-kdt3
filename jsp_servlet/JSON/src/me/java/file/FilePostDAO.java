@@ -1,7 +1,6 @@
 package me.java.file;
 
 import me.java.database.JDBCMgr;
-import me.java.member.Member;
 
 import java.lang.reflect.InvocationTargetException;
 import java.sql.*;
