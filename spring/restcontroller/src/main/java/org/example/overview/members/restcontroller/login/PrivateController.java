@@ -1,4 +1,4 @@
-package org.example.overview.members.controller.login;
+package org.example.overview.members.restcontroller.login;
 
 import org.example.overview.cookies.CookieMgr;
 import org.example.overview.members.dto.MemberDTO;
@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-@Controller
+@RestController
 @RequestMapping("/members")
 public class PrivateController { // 개인 설정 페이지 컨트롤러
     private MemberService memberService; // = MemberService.getInstance();
@@ -29,30 +29,6 @@ public class PrivateController { // 개인 설정 페이지 컨트롤러
         this.memberService = memberService;
         this.cookieMgr = cookieMgr;
         this.sessionMgr = sessionMgr;
-    }
-
-    @GetMapping("/private")
-    public String privatePage(Model model, HttpSession session) {
-        String view = "members/login/private";
-
-        if (session.getAttribute("SESSION_ID") == null) {
-            return "redirect:/";
-        }
-
-        model.addAttribute("uId", sessionMgr.get(session));
-        return view;
-    }
-
-    @GetMapping("/private/rev")
-    public String updatePage(Model model, HttpSession session) {
-        String view = "members/login/update";
-
-        if (session.getAttribute("SESSION_ID") == null) {
-            return "redirect:/";
-        }
-
-        model.addAttribute("uId", sessionMgr.get(session));
-        return view;
     }
 
 
@@ -119,19 +95,6 @@ public class PrivateController { // 개인 설정 페이지 컨트롤러
 
         System.out.println("res = " + res);
         return status;
-    }
-
-
-    @GetMapping("/private/rm")
-    public String withdrawPage(Model model, HttpSession session) {
-        String view = "members/login/withdraw";
-
-        if (session.getAttribute("SESSION_ID") == null) {
-            return "redirect:/";
-        }
-
-        model.addAttribute("uId", sessionMgr.get(session));
-        return view;
     }
 
 
