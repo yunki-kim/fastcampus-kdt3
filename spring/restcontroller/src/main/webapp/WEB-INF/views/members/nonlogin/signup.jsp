@@ -3,7 +3,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>JSP</title>
+    <title>SPRING</title>
     <link href="/resources/css/style.css" rel="stylesheet" type="text/css">
 </head>
 <body>
@@ -20,7 +20,7 @@
 
     function duplicateId() {
         const checkIdRequest = new XMLHttpRequest();
-        const url = "/members/signup/duplicate?uId=" + $("#uId").val();
+        const url = "/members/signup/checkId?uId=" + $("#uId").val();
         const method = "post";
 
         checkIdRequest.open(method, url, true);
