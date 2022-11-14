@@ -1,0 +1,155 @@
+package org.example.overview.config;
+
+import com.mchange.v2.c3p0.ComboPooledDataSource;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import org.example.overview.members.mapper.MemberMapper;
+import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.mybatis.spring.SqlSessionFactoryBean;
+import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.context.EnvironmentAware;
+import org.springframework.context.annotation.*;
+import org.springframework.core.env.Environment;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import javax.sql.DataSource;
+import java.beans.PropertyVetoException;
+
+@Configuration
+@EnableTransactionManagement(proxyTargetClass = true) // 인자로 트랜잭션을 관리하는 Service 빈을 넘길 경우 트랜잭션 처리를 가능하게 하기 위함
+@PropertySource("classpath:/datasource/datasource.properties")
+@ComponentScan(basePackages = "org.example.overview",
+        useDefaultFilters = false,
+        includeFilters = {
+                @ComponentScan.Filter(type = FilterType.ANNOTATION,
+                        value = {Component.class, Repository.class, Service.class})}
+)
+@MapperScan(basePackageClasses = MemberMapper.class)
+public class WebAppConfig implements EnvironmentAware {
+
+    Environment environment; // null 임을 방지
+
+    @Override
+    public void setEnvironment(Environment environment) { // environment 객체가 null임을 방지
+        this.environment = environment;
+    }
+
+
+
+    /** DBCP 등록 */
+    @Bean
+    public BasicDataSource basicDataSource() {
+        // org.apache.commons.dbcp2.BasicDataSource
+
+        BasicDataSource basicDataSource = new BasicDataSource();
+        basicDataSource.setDriverClassName(environment.getProperty("spring.datasource.driverClassName"));
+        basicDataSource.setUrl(environment.getProperty("spring.datasource.url"));
+        basicDataSource.setUsername(environment.getProperty("spring.datasource.username"));
+        basicDataSource.setPassword(environment.getProperty("spring.datasource.password"));
+
+        basicDataSource.setInitialSize(Integer.parseInt(environment.getProperty("apache.commons.dbcp2.config.initialSize")));
+        basicDataSource.setMaxTotal(Integer.parseInt(environment.getProperty("apache.commons.dbcp2.config.maxTotal")));
+        basicDataSource.setMinIdle(Integer.parseInt(environment.getProperty("apache.commons.dbcp2.config.maxIdle")));
+        basicDataSource.setMinIdle(Integer.parseInt(environment.getProperty("apache.commons.dbcp2.config.minIdle")));
+        basicDataSource.setMaxWaitMillis(Long.parseLong(environment.getProperty("apache.commons.dbcp2.config.maxWaitMillis")));
+
+        return basicDataSource;
+    }
+
+    @Bean
+    public ComboPooledDataSource comboPooledDataSource() {
+        // com.mchange.v2.c3p0.ComboPooledDataSource
+
+        ComboPooledDataSource comboPooledDataSource = new ComboPooledDataSource();
+        try {
+            comboPooledDataSource.setDriverClass(environment.getProperty("spring.datasource.driverClassName"));
+            comboPooledDataSource.setJdbcUrl(environment.getProperty("spring.datasource.url"));
+            comboPooledDataSource.setUser(environment.getProperty("spring.datasource.username"));
+            comboPooledDataSource.setPassword(environment.getProperty("spring.datasource.password"));
+
+            comboPooledDataSource.setInitialPoolSize(Integer.parseInt(environment.getProperty("com.mchange.v2.c3p0.config.initialPoolSize")));
+            comboPooledDataSource.setMaxPoolSize(Integer.parseInt(environment.getProperty("com.mchange.v2.c3p0.config.maxPoolSize")));
+            comboPooledDataSource.setMinPoolSize(Integer.parseInt(environment.getProperty("com.mchange.v2.c3p0.config.minPoolSize")));
+            comboPooledDataSource.setMaxIdleTime(Integer.parseInt(environment.getProperty("com.mchange.v2.c3p0.config.maxIdleTime")));
+            comboPooledDataSource.setAcquireIncrement(Integer.parseInt(environment.getProperty("com.mchange.v2.c3p0.config.acquireIncrement")));
+            comboPooledDataSource.setAcquireRetryAttempts(Integer.parseInt(environment.getProperty("com.mchange.v2.c3p0.config.acquireRetryAttempts")));
+            comboPooledDataSource.setAcquireRetryDelay(Integer.parseInt(environment.getProperty("com.mchange.v2.c3p0.config.acquireRetryDelay")));
+
+        } catch (PropertyVetoException e) {
+            throw new RuntimeException(e);
+        }
+
+        return comboPooledDataSource;
+    }
+
+    @Bean
+    public HikariDataSource hikariDataSource() {
+        // com.zaxxer.hikari.HikariConfig
+
+        HikariConfig hikariConfig = new HikariConfig();
+        hikariConfig.setDriverClassName(environment.getProperty("spring.datasource.driverClassName"));
+        hikariConfig.setJdbcUrl(environment.getProperty("spring.datasource.url"));
+        hikariConfig.setUsername(environment.getProperty("spring.datasource.username"));
+        hikariConfig.setPassword(environment.getProperty("spring.datasource.password"));
+
+        hikariConfig.setPoolName(environment.getProperty("com.zaxxer.hikari.config.poolName"));
+        hikariConfig.setMaximumPoolSize(Integer.parseInt(environment.getProperty("com.zaxxer.hikari.config.maximumPoolSize")));
+        hikariConfig.setConnectionTimeout(Long.parseLong(environment.getProperty("com.zaxxer.hikari.config.connectionTimeOut")));
+        hikariConfig.setIdleTimeout(Long.parseLong(environment.getProperty("com.zaxxer.hikari.config.idleTimeout")));
+        hikariConfig.setAutoCommit(Boolean.parseBoolean(environment.getProperty("com.zaxxer.hikari.config.autoCommit")));
+        hikariConfig.setAutoCommit(Boolean.parseBoolean(environment.getProperty("com.zaxxer.hikari.config.readOnly")));
+
+        HikariDataSource hikariDataSource = new HikariDataSource(hikariConfig);
+
+        System.out.println(hikariDataSource);
+
+        return hikariDataSource;
+    }
+
+    @Bean
+    public DataSource dataSource() {
+//        return basicDataSource(); // dbcp2
+//        return comboPooledDataSource(); // c3p0
+        return hikariDataSource(); // hikariConfig
+
+    }
+
+    /** Jdbc Template */
+    @Bean
+    public JdbcTemplate jdbcTemplate() {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate();
+        jdbcTemplate.setDataSource(dataSource());
+        return jdbcTemplate;
+    }
+
+
+    /** MyBatis SqlSessionFactory 등록 */
+    @Bean
+    public SqlSessionFactory sqlSessionFactory() throws Exception {
+        SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
+        sqlSessionFactoryBean.setDataSource(dataSource()); // 명시적인 데이터 소스 설정
+        return sqlSessionFactoryBean.getObject();
+    }
+
+//    @Bean
+//    public SqlSessionTemplate sqlSession() throws Exception {
+//        return new SqlSessionTemplate(sqlSessionFactory());
+//    }
+
+
+    /** 스프링 트랜잭션 관리를 위한 transaction manager 등록 */
+    @Bean
+    public DataSourceTransactionManager transactionManager() {
+        DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager();
+        dataSourceTransactionManager.setDataSource(dataSource());
+        return dataSourceTransactionManager;
+    }
+
+}
+
